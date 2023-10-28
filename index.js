@@ -46,6 +46,18 @@ async function run() {
     })
 
     //Bookings
+    app.post('/bookings', async(req,res)=>{
+      const booking = req.body;
+      const result = await bookingCollections.insertOne(booking);
+      res.send(result);
+    })
+    app.get('/bookings',async(req,res)=>{
+      const cursor = bookingCollections.find();
+      const result = await cursor.toArray();
+
+      res.send(result);
+
+    })
 
   
 
