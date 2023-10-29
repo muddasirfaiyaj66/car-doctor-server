@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-require ('dotenv').config()
+require('dotenv').config()
 const app = express();
 const port = process.env.PORT || 5000;
 
@@ -31,40 +31,48 @@ async function run() {
     const serviceCollection = client.db('CarDoctor').collection('services');
     const bookingCollections = client.db('CarDoctor').collection('bookings');
 
-    app.get('/services', async(req,res)=>{
+    app.get('/services', async (req, res) => {
       const cursor = serviceCollection.find();
       const result = await cursor.toArray();
 
       res.send(result);
     })
-    app.get('/services/:id', async(req,res)=>{
-      const id= req.params.id;
-      const query = {_id: new ObjectId(id)}
+    app.get('/services/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
 
       const result = await serviceCollection.findOne(query);
       res.send(result)
     })
 
     //Bookings
-    app.post('/bookings', async(req,res)=>{
+    app.post('/bookings', async (req, res) => {
       const booking = req.body;
       const result = await bookingCollections.insertOne(booking);
       res.send(result);
     })
-    app.get('/bookings',async(req,res)=>{
-      
-      let query ={};
-      if(req.query?.email){
-        query = {email: req.query.email}
+    app.get('/bookings', async (req, res) => {
+
+      let query = {};
+      if (req.query?.email) {
+        query = { email: req.query.email }
       }
       const cursor = bookingCollections.find(query);
       const result = await cursor.toArray();
 
       res.send(result);
 
+    });
+
+    app.delete('/bookings/:id', async(req,res) =>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const result = await bookingCollections.deleteOne(query)
+      res.send(result)
+
     })
 
-  
+
 
 
     await client.db("admin").command({ ping: 1 });
@@ -76,10 +84,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get('/', async(req,res)=>{
-    res.send({message: "Car Doctor Server Running!!"});
+app.get('/', async (req, res) => {
+  res.send({ message: "Car Doctor Server Running!!" });
 });
 
-app.listen(port, () =>{
-    console.log(`Server is running on ${port}`);
+app.listen(port, () => {
+  console.log(`Server is running on ${port}`);
 })
